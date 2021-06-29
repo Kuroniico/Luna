@@ -47,6 +47,13 @@
 
         } break;
 
+        case 'obligatoire': {
+
+            $stmt = $DB->prepare( "UPDATE Questions SET Obligatoire = ? WHERE `_ID` = ?" );
+            $stmt->execute( array( $data["state"] === true ? 1 : 0, $data["idQuestion"] ) );
+
+        } break;
+
 
         default:
             # code...

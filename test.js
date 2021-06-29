@@ -1,4 +1,4 @@
-const selects = document.querySelectorAll( ".form-select, .typedeRep" );
+const selects = document.querySelectorAll( ".form-select.typedeRep" );
 
 for ( const iterator of selects ) {
 
@@ -145,7 +145,18 @@ for ( const Obligatoire of Obligatoires ) {
 
     Obligatoire.addEventListener( "change", ( event ) => {
 
-        console.log( event )
+        console.log( event.srcElement.checked )
+
+        fetch( "./API/updateQuestions.php", {
+            method      : "POST",
+            body        : JSON.stringify({
+                method      : "obligatoire",
+                idQuestion  : event.srcElement.parentNode.parentNode.id,
+                state       : event.srcElement.checked
+            })
+        })
+
+
 
     });
 

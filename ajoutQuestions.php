@@ -136,6 +136,10 @@
 
                         <h4 class="mt-4 mb-4">Questions</h4>
 
+                        <div class="alert alert-primary text-center">
+                            <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#addQuestion">Ajouter une questions</a>.
+                        </div>
+
                             <?php
 
                                 $Questions = $DB->prepare( "SELECT * FROM Questions WHERE Categorie = ?" );
@@ -201,7 +205,7 @@
                                             </div>
 
                                             <div class="mb-3 form-check mt-2">
-                                                <input type="checkbox" class="form-check-input Obligatoire">
+                                                <input type="checkbox" class="form-check-input Obligatoire" <?= $Question["Obligatoire"] === "1" ? "checked" : "de"  ?>>
                                                 <label class="form-check-label" for="Annuler">Question Obligatoire</label>
                                             </div>
 
@@ -266,10 +270,53 @@
             </div>
         </div>
 
+        <div class="modal fade" id="addQuestion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addQuestion" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Ajouter une question</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="" name="Intitulé" style="height: 100px"></textarea>
+                                <label for="introduction">Intitulé</label>
+                            </div>
+
+                            <div class="form-floating mt-2">
+                                <select class="form-select" name="responseType">
+                                    <option value="1">Réponse libre</option>
+                                    <option value="2">Texte à cocher</option>
+                                    <option value="3">Texte à cocher & justification</option>
+                                </select>
+                                <label for="typedeRep">Type de réponse</label>
+                            </div>
+
+                            <div class="mb-3 form-check mt-2">
+                                <input type="checkbox" class="form-check-input" name="Obligatoire">
+                                <label class="form-check-label" for="Annuler">Question Obligatoire</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" name="addQuestionForm" class="btn btn-primary">Ajouter</button>
+                        </div>
+
+                    <form>
+                </div>
+            </div>
+        </div>
+
     </body>
 
 
     <?php
+
+        if ( isset( $_POST["addQuestionForm"] ) ) {
+            print_r($_POST );
+        }
 
         if ( isset( $_POST["logout"] ) ) {
 
