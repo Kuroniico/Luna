@@ -131,7 +131,7 @@ function updateResponse ( idRep, newContent ) {
     .then( ( res ) => res.text() )
     .then( ( res ) => {
 
-        console.log( res)
+        console.log( res )
 
 
 
@@ -161,3 +161,11 @@ for ( const Obligatoire of Obligatoires ) {
     });
 
 }
+
+
+document.getElementById( "addQuestion" ).addEventListener( "click", ( event ) => {
+
+    console.log( event.srcElement.parentNode.parentNode );
+
+
+} )

@@ -11,12 +11,20 @@ class ComposerStaticInit7bc5df110ad0c0724dce125f4e0bd383
         array (
             'Spipu\\Html2Pdf\\' => 15,
         ),
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Spipu\\Html2Pdf\\' => 
         array (
             0 => __DIR__ . '/..' . '/spipu/html2pdf/src',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
     );
 

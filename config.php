@@ -11,11 +11,34 @@
     // — Mot de passe
     $UserPass   = "uncafesvp";
 
+    // —— Mail
+
+    // $mailHost       = "smtp.example.com";
+    // $mailTo         = "user@example.com";
+    // $mailSMTPAuth   = true;
+    // $mailUsername   = "user@example.com";
+    // $mailPassword   = "secret";
+    // $mailPort       = 465;
+
+    $mailHost       = "smtp.gmail.com";
+    $mailTo         = "geyinox144@herrain.com";
+    $mailSMTPAuth   = true;
+    $mailUsername   = "coriolistestrecrutement@gmail.com";
+    $mailPassword   = "C0r10l1s";
+    $mailPort       = 587;
+
     return array(
         $DBHost,
         $DBName,
         $UserLogin,
         $UserPass,
+
+        $mailHost,
+        $mailTo,
+        $mailSMTPAuth,
+        $mailUsername,
+        $mailPassword,
+        $mailPort,
     );
 
 ?>

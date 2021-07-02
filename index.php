@@ -37,7 +37,11 @@
 
                             $lastID = $lastID->fetch();
 
-                            $testDuration = $DB->query( "SELECT `DureeTest`, `TempsAd` FROM `Parametres`" );
+                            $testDuration = $DB->prepare( "SELECT `Durée`, `DuréeAdditionnel` FROM `Tests` WHERE `_ID` = ?" );
+                            $testDuration->execute(array(
+                                $_POST["IDTest"],
+                            ));
+
                             $testDuration = $testDuration->fetch();
 
                             $insert = $DB->prepare( "INSERT INTO `Candidats`( `_Token`, `Nom`, `Prenom`, `DateDeNaissance`, `Telephone`, `Mail`, `IDPEmploi`, `DateDebutDisp`, `DatefinDisp`, `TempsRestant`,  `TempsAdRestant` )
@@ -54,14 +58,13 @@
                                 $_POST["IDPoleE"],
                                 $_POST["StartDisp"],
                                 $_POST["EndDisp"],
-                                $testDuration["DureeTest"],
-                                $testDuration["TempsAd"]
+                                $testDuration["Durée"],
+                                $testDuration["DuréeAdditionnel"]
                             ));
 
                             header( "Location: test.php?uid=".$token."&test=".$_POST["IDTest"] );
 
                         }
-
 
                     ?>
 

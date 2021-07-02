@@ -30,24 +30,26 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">-</a>
+            <div class="container">
+                <a class="navbar-brand" href="#">Acces formateur</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="./generationTest.php">Generer un test</a>
+                            <a class="nav-link" aria-current="page" href="./generationTest.php">Generer un test</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./ajoutQuestions.php">Ajouter des questions</a>
+                            <a class="nav-link" href="./ajoutQuestions.php">Gestion des questions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./gestionAdministrateur.php">Administrateur</a>
+                            <a class="nav-link active" href="./gestionAdministrateur.php">Gestion des administrateurs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./parametres.php">Parametres</a>
                         </li>
                     </ul>
-
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,7 +64,6 @@
 
                     </ul>
                 </div>
-            </div>
         </nav>
 
         <div class="container">

@@ -19,6 +19,9 @@
 
         <div class="vertical-centered-box">
             <div class="content">
+
+                <img src="./Assets/logo.png" width="300">
+
                 <div class="card">
                     <div class="card-body">
                         <form method="post" >
@@ -30,7 +33,8 @@
                                 <label for="password" class="form-label">Mot de passe</label>
                                 <input type="password" class="form-control" name="password" required>
                             </div>
-                            <button type="submit" name="submit" class="btn btn-primary">Envoyer</button>
+                            <a href="./" class="btn btn-secondary">Retour</a>
+                            <button type="submit" name="submit" class="btn btn-primary">Connexion</button>
 
                             <span id="formInfo"></span>
 
@@ -71,12 +75,12 @@
                         $_SESSION['_userID']    = $stmt["ID"];
                         $_SESSION['Login']      = $_POST['email'];
 
-                        header( "Location: ./admin.php ");
+                        header( "Location: ./generationTest.php ");
 
 
-                    } else echo "<script>document.getElementById('formInfo').innerHTML = 'Wrong password' </script>";
+                    } else echo "<script>document.getElementById('formInfo').innerHTML = 'Mot de passe erroné' </script>";
 
-                } else echo "<script>document.getElementById('formInfo').innerHTML = 'Wrong username or password' </script>";
+                } else echo "<script>document.getElementById('formInfo').innerHTML = 'Nom d'utilisateur ou mot de passe erroné' </script>";
             }
         }
 

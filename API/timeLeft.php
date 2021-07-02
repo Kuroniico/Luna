@@ -20,30 +20,43 @@
         echo "You must indicate the identifier of the target";
 
 
-    $param  = $DB->query( "SELECT * FROM `Parametres`" );
-    $sth    = $DB->prepare( "SELECT TempsRestant, TempsADRestant FROM `Candidats` WHERE _ID = ".$data[ 'UserID' ] );
+    if ( $data["endTest"] ) {
 
-    $sth->execute();
-    $sth = $sth->fetch();
+        $stop = $DB->prepare( "UPDATE `Candidats` SET `TempsRestant` = 0, `TempsAdRestant` = 0 WHERE _ID = ?" );
+        $stop->execute( array($data["UserID"]) );
 
-    $currentTime = $sth[0];
-    $adTime = $sth[0];
+    } else {
 
-    if ( $sth ) {
-
-        if ( $currentTime < $param["DureeTest"] ) {
-
-            $sth = $DB->prepare( "UPDATE `Candidats` SET `TempsRestant` = ? WHERE _ID = ".$data[ 'UserID' ] );
-            $sth->execute( array( $currentTime - 1 ) );
+        $test  = $DB->prepare( "SELECT `Durée`, `DuréeAdditionnel` FROM Tests WHERE `_ID` = ?" );
+        $test->execute( array($data["test"]) );
+        $test = $test->fetch();
 
 
-        } else {
+        $sth    = $DB->prepare( "SELECT TempsRestant, TempsADRestant FROM `Candidats` WHERE _ID = ".$data[ 'UserID' ] );
 
-            $sth = $DB->prepare( "UPDATE `Candidats` SET `TempsADRestant` = ? WHERE _ID = ".$data[ 'UserID' ] );
-            $sth->execute( array( $adTime - 1 ) );
+        $sth->execute();
+        $sth = $sth->fetch();
+
+        $currentTime = $sth[0];
+        $adTime = $sth[1];
+
+        if ( $sth ) {
+
+            if ( $currentTime > 0 ) {
+
+                $sth = $DB->prepare( "UPDATE `Candidats` SET `TempsRestant` = ? WHERE _ID = ".$data[ 'UserID' ] );
+                $sth->execute( array( $currentTime - 1 ) );
+
+            } else {
+
+                $sth = $DB->prepare( "UPDATE `Candidats` SET `TempsAdRestant` = ? WHERE _ID = ".$data[ 'UserID' ] );
+                $sth->execute( array( $adTime - 1 ) );
+
+            }
 
         }
 
     }
+
 
 ?>

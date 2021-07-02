@@ -32,22 +32,19 @@
     if ( !$test )
         echo "no test";
 
-    $user = $DB->prepare( "SELECT _ID, TempsRestant FROM Candidats WHERE _Token = ? LIMIT 1" );
+    $dureeTest = $test[0]["Durée"];
+    $dureeAdTest = $test[0]["DuréeAdditionnel"];
+
+    $user = $DB->prepare( "SELECT _ID, TempsRestant, TempsAdRestant, _Token FROM Candidats WHERE _Token = ? LIMIT 1" );
     $user->execute( array( $_GET["uid"] ) );
 
     $user = $user->fetch();
 
     if ( !$user )
-        echo "no user";
+        header("Location: ./");
 
-
-    // if ( $user[1] < 0 ) {
-
-    //     echo "test end";
-    //     return;
-
-    // }
-
+    if ( $user["TempsRestant"] + $user["TempsAdRestant"] <= 0 )
+        header("Location: ./");
 
     $tests = array();
 
@@ -85,10 +82,10 @@
 
                 <span class="btn alert-primary">
                     <span id="typeTemps">Temps restant</span> :
-                    <span class="badge bg-secondary" id="timeLeft">30:00</span>
+                    <span class="badge bg-secondary" id="timeLeft">00:00</span>
                 </span>
 
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#endConfirmModal">
+                <button type="button" class="btn btn-primary" id="endButton">
                     Finir le test
                 </button>
 
@@ -159,7 +156,9 @@
                                         ) );
 
                                         $userResp = $repQuestion->fetch();
-                                        echo "<input type='text' class='form-control inputTextbox'  id='".$question["_ID"]."' value=\"".htmlspecialchars( $userResp["Reponse"] )."\">";
+
+                                        print_r($userResp);
+                                        echo "<input type='text' class='form-control inputTextbox'  id='".$question["_ID"]."' value=\"".( isset( $userResp["Reponse"] ) ? htmlspecialchars( $userResp["Reponse"] ) :"" )."\">";
 
                                      } break;
 
@@ -183,7 +182,7 @@
                                         <?php foreach ( $responses as $rIndex => $response ) { ?>
 
                                             <div class="form-check">
-                                                <input class="form-check-input inputCheck inputRadio" type="radio" name="<?= $question["_ID"] ?>" id="<?= $idx++ ?>" value="option1" <?= ( int )$userResp["Select"] === $idx-1 ? "checked" : "" ?> >
+                                                <input class="form-check-input inputCheck inputRadio" type="radio" name="<?= $question["_ID"] ?>" id="<?= $idx++ ?>" value="option1" <?= isset($userResp["Select"] ) && ( int )$userResp["Select"] === $idx-1 ? "checked" : "" ?> >
                                                 <label class="form-check-label" for="exampleRadios1">
                                                     <?= $response["Reponse"] ?>
                                                 </label>
@@ -200,9 +199,6 @@
                                         $idx = 0;
 
                                         foreach ( $responses as $rIndex => $response ) {
-
-                                            ///print_r($userResp);
-
 
                                         ?>
 
@@ -231,23 +227,51 @@
 
         </div>
 
-        <div class="modal fade" id="endConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="endModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form action="" method="post" style="display: inline">
-                        <button type="submit" class="btn btn-primary" name="validateEnd">Understood</button>
+                    <form method="post"> <!-- t'es un gros bg -->
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">C'est fini !</h5>
+                        </div> <!-- t'es bonne -->
+                        <div class="modal-body">
+                            <div>
+                                <label for="selectSource">Comment avez-vous entendu parler de nous ?</label>
+
+                                <select name="source" id="selectSource">
+                                    <option value="">Veuillez sélectionner une source</option>
+                                    <option value="courrierPicard">Article Courrier Picard</option>
+                                    <option value="cooptation">Cooptation</option>
+                                    <option value="siteCourrierPicard">Annonce site Courrier Picard</option>
+                                    <option value="indeed">Indeed</option>
+                                    <option value="missionLocale">Mission Locale</option>
+                                    <option value="chasseurEmploi">Les chasseurs de l'emploi</option>
+                                    <option value="huclink">Huclink</option>
+                                    <option value="leboncoin">Le Bon Coin</option>
+                                    <option value="poleemploi">Pôle Emploi</option>
+                                    <option value="coriolisfr">Coriolis.fr</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="spontanee">Spontanée</option>
+                                    <option value="jda">JDA</option>
+                                    <option value="matchHockey">Affichage matchs de hockey des Gothiques</option>
+                                    <option value="affichageAbriBus">Campagne d'affichage "abris de bus"</option>
+                                    <option value="journalCourrierPicard">Annonce journal Courrier Picard</option>
+                                </select>
+                            </div>
+                            <br>
+                            <p>Avant de valider, avez vous une remarque ?</p>
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Leave a comment here" id="remarque" name="remarque" style="height: 100px"></textarea>
+                                <label for="remarque">Faites-nous en part </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary" name="submitForm">Enregistrer, et envoyer !</button>
+                        </div>
+
                     </form>
 
-                </div>
                 </div>
             </div>
         </div>
@@ -276,23 +300,13 @@
 
     </body>
 
-
-
-    <?php
-
-    if ( isset( $_POST["validateEnd"]) ) {
-
-        $sth = $DB->prepare( "UPDATE `Candidats` SET `TempsRestant`= ?,`TempsAdRestant`= ? WHERE `_Token` = ?" );
-        $sth->execute( array( 0, 0 , $_GET[ 'uid' ]) );
-        echo "test";
-
-    }
-$_GET[ 'uid' ]
-
-    ?>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script>
+
+        const timeLeft = document.getElementById("timeLeft");
+        const timeType = document.getElementById("typeTemps");
+        const progress = document.getElementById("timeBar")
+
 
         for ( const questionType1 of document.querySelectorAll( ".inputTextbox" ) ) {
 
@@ -305,7 +319,7 @@ $_GET[ 'uid' ]
                     method      : "POST",
                     body        : JSON.stringify({
                         Type    : "1",
-                        UserID  : <?= $user[0] ?>,
+                        UserID  : "<?= $user[0] ?>",
                         TestID  : url.get( "test" ),
                         QuetID  : event.srcElement.id,
                         Respon  : event.srcElement.value
@@ -333,7 +347,7 @@ $_GET[ 'uid' ]
                     method      : "POST",
                     body        : JSON.stringify({
                         Type    : "2",
-                        UserID  : <?= $user[0] ?>,
+                        UserID  : "<?= $user[0] ?>",
                         TestID  : url.get( "test" ),
                         QuetID  : event.srcElement.parentNode.parentNode.id,
                         Select  : event.srcElement.id
@@ -361,21 +375,6 @@ $_GET[ 'uid' ]
 
         }
 
-    </script>
-
-    <?php
-
-        $userTimeLeft = $DB->prepare( "SELECT TempsRestant, TempsAdRestant  FROM `Candidats` WHERE _Token = ? LIMIT 1" );
-        $userTimeLeft->execute( array( $_GET["uid"] ) );
-        $userTimeLeft = $userTimeLeft->fetch()[0];
-
-        $testDuration = $DB->query( "SELECT * FROM Parametres;" );
-        $testDuration = $testDuration->fetch()[0];
-
-    ?>
-
-    <script>
-
         /** Converts a certain number of seconds to formatted time hh:mm:ss
          * @param {number} seconds // Name of second to convert
          */
@@ -391,65 +390,120 @@ $_GET[ 'uid' ]
             ].filter( Boolean ).join( ":" );
         }
 
+        const dureeTest = <?= $dureeTest ?>;
+        const dureeAdTest = <?= $dureeAdTest ?>;
 
-        let timeLeft    = parseInt( <?= $userTimeLeft ?>   );
-        let timeAdLeft  = parseInt( <?= $userTimeLeft ?> );
-
-        timeLeft        = 3;
-
-        document.getElementById('timeLeft').innerHTML = formatTime( timeLeft );
-        document.getElementsByClassName('progress-bar').item(0).setAttribute('aria-valuenow', timeLeft / <?= $testDuration ?> * 100 );
-        document.getElementsByClassName('progress-bar').item(0).setAttribute('style',"width:" + Number( timeLeft-- / <?= $testDuration ?> * 100 )+'%');
+        let userDureeTest = <?= $user["TempsRestant"] ?>;
+        let userDureeAdTest = <?= $user["TempsAdRestant"] ?>;
 
 
-        const test = setInterval( () => {
+        function endTest () {
 
-            if ( timeLeft < 0 ) {
-                document.getElementsByClassName("progress-bar").item(0).setAttribute("aria-valuenow", 0 );
-                document.getElementsByClassName("progress-bar").item(0).setAttribute("style","width:"+Number( 0 )+"%");
-                clearInterval( test );
-
-                    //  —— Check test
-                    fetch( "./API/generatePDF.php", {
-                        method      : "POST",
-                        body        : JSON.stringify({})
-                    })
-                    .then( ( res ) => res.text() )
-                    .then( ( res ) => {
-
-                    })
-
-                return;
-            }
-
-            //  —— Check test
             fetch( "./API/timeLeft.php", {
                 method      : "POST",
                 body        : JSON.stringify({
-                    UserID  : <?= $user[0] ?>,
+                    UserID  : "<?= $user[0] ?>",
+                    endTest : true,
                 })
             })
             .then( ( res ) => res.text() )
             .then( ( res ) => {
 
-                document.getElementById('timeLeft').innerHTML = formatTime( timeLeft );
-                document.getElementsByClassName('progress-bar').item(0).setAttribute( "aria-valuenow", timeLeft / <?= $testDuration ?> * 100 );
-                document.getElementsByClassName('progress-bar').item(0).setAttribute( "style",'width:'+Number( timeLeft-- / <?= $testDuration ?> * 100 )+'%');
+                timeLeft.innerText = formatTime( 0 );
+                progress.setAttribute( "aria-valuenow", 0 );
+                progress.setAttribute( "style", `width: 0%` );
 
-                if ( timeLeft / <?= $testDuration ?> * 100 < 50 )
-                    document.getElementsByClassName( 'progress-bar' ).item(0).classList.add( "bg-warning" );
 
-                if ( timeLeft / <?= $testDuration ?> * 100 < 30 )
-                    document.getElementsByClassName( 'progress-bar' ).item(0).classList.add( "bg-danger" );
+                const endModal = new bootstrap.Modal( document.getElementById("endModal") )
+                endModal.show();
 
-            }).catch( ( err ) => {
+                fetch( "./API/generatePDF.php", {
+                method      : "POST",
+                body        : JSON.stringify({
+                    test    : "<?= $_GET["test"] ?>",
+                    uid     : "<?= $user["_Token"] ?>",
+                    endTest : true,
+                })
+            })
 
-                serverError
 
             });
+        }
 
-        }, 1000 );
+        function timeUpdate () {
 
+            if ( userDureeTest > 0 ) {
+
+                fetch( "./API/timeLeft.php", {
+                    method      : "POST",
+                    body        : JSON.stringify({
+                        UserID  : "<?= $user[0] ?>",
+                        test    : "<?= $_GET["test"] ?>",
+                    })
+                })
+                .then( ( res ) => res.text() )
+                .then( ( res ) => {
+
+                    timeLeft.innerText = formatTime( --userDureeTest );
+                    timeType.innerText = "Temps restant";
+
+                    if ( userDureeTest / dureeTest * 100 < 50 )
+                        progress.classList.add( "bg-warning" );
+
+                    if ( userDureeTest / dureeTest * 100 < 30 )
+                        progress.classList.add( "bg-danger" );
+
+                    progress.setAttribute( "aria-valuenow", Number( userDureeTest / dureeTest ) * 100 );
+                    progress.setAttribute( "style", `width:${ Number( userDureeTest / dureeTest ) * 100 }%` );
+
+                }).catch( ( err ) => {
+
+                    console.log( "test" )
+
+                });
+
+            } else if ( userDureeAdTest > 0 ) {
+
+                fetch( "./API/timeLeft.php", {
+                    method      : "POST",
+                    body        : JSON.stringify({
+                        UserID  : "<?= $user[0] ?>",
+                        test    : "<?= $_GET["test"] ?>",
+                    })
+                })
+                .then( ( res ) => res.text() )
+                .then( ( res ) => {
+
+                    timeType.parentNode.classList.add( "alert-danger" );
+                    timeLeft.innerText = formatTime( --userDureeAdTest );
+                    timeType.innerText = "Temps additionel restant";
+                    progress.classList.add( "bg-danger" );
+
+                    progress.setAttribute( "aria-valuenow", Number( userDureeAdTest / dureeAdTest ) * 100 );
+                    progress.setAttribute( "style", `width:${ Number( userDureeAdTest / dureeAdTest ) * 100 }%` );
+
+                }).catch( ( err ) => {
+
+                    console.log( "test" )
+
+                });
+
+            } else {
+
+                clearInterval( timer );
+                endTest();
+
+            }
+
+        }
+
+        document.getElementById("endButton").addEventListener( "click", () => {
+            clearInterval( timer );
+            endTest();
+        })
+
+        const timer = setInterval( timeUpdate, 1000 );
+        timeUpdate();
 
     </script>
 
